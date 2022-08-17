@@ -12,6 +12,8 @@ struct LoginView: View {
     @State var password = ""
     @State var isLoginMode = false
     @State var loginStatusMessage = ""
+    @State var image: UIImage? = nil
+    @State var shouldShowImagePicker = false
     
     var body: some View {
         NavigationView {
@@ -30,11 +32,25 @@ struct LoginView: View {
                     
                     if !isLoginMode {
                         Button(action: {
-                            
+                            shouldShowImagePicker.toggle()
                         }, label: {
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 64))
-                                .padding()
+                            
+                            VStack {
+                                if let image = self.image {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .clipShape(Circle())
+                                        .frame(width: 128, height: 128)
+                                } else {
+                                    Image(systemName: "person.fill")
+                                        .font(.system(size: 64))
+                                        .padding()
+                                        .foregroundColor(Color(.label))
+                                }
+                            }
+                            .overlay(RoundedRectangle(cornerRadius: 64)
+                                .stroke(Color.black, lineWidth: 3))
                         })
                     }
 
@@ -72,6 +88,9 @@ struct LoginView: View {
             .background(Color(.init(white: 0, alpha: 0.05)).ignoresSafeArea())
         }
         .navigationViewStyle(.stack)
+        .fullScreenCover(isPresented: $shouldShowImagePicker, content: {
+            ImagePicker(image: $image)
+        })
     }
 }
 
@@ -103,6 +122,29 @@ private extension LoginView {
             }
             
             loginStatusMessage = "Successfully login User: \(result?.user.uid ?? "")"
+        }
+    }
+    
+    func persistImageToStorage() {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid, let imageData = self.image?.jpegData(compressionQuality: 0.5) else {
+            return
+        }
+        
+        let reference = FirebaseManager.shared.storage.reference(withPath: uid)
+        reference.putData(imageData, metadata: nil) { metadata, error in
+            if let error = error {
+                self.loginStatusMessage = "Failed to push image to Storage: \(error)"
+                return
+            }
+            
+            reference.downloadURL { response in
+                switch response {
+                case .success(let url):
+                    self.loginStatusMessage = "Successfully stored image with url: \(url.absoluteString)"
+                case .failure(let error):
+                    self.loginStatusMessage = "Failed to retrieve downloadURL: \(error)"
+                }
+            }
         }
     }
 }
