@@ -6,12 +6,12 @@
 //
 
 import SwiftUI
-import Firebase
 
 struct LoginView: View {
     @State var email = ""
     @State var password = ""
     @State var isLoginMode = false
+    @State var loginStatusMessage = ""
     
     var body: some View {
         NavigationView {
@@ -62,6 +62,9 @@ struct LoginView: View {
                         }
                         .background(.blue)
                     })
+                    
+                    Text(loginStatusMessage)
+                        .foregroundColor(.red)
                 }
                 .padding()
             }
@@ -75,9 +78,31 @@ struct LoginView: View {
 private extension LoginView {
     func handleAction() {
         if isLoginMode {
-            print("Should log into Firebase with existing credentials")
+            loginUser()
         } else {
-            print("blabla")
+            createNewAccount()
+        }
+    }
+    
+    func createNewAccount() {
+        FirebaseManager.shared.auth.createUser(withEmail: email, password: password) { result, error in
+            if let error = error {
+                loginStatusMessage = "Failed to create User: \(error)"
+                return
+            }
+            
+            loginStatusMessage = "Successfully create User: \(result?.user.uid ?? "")"
+        }
+    }
+    
+    func loginUser() {
+        FirebaseManager.shared.auth.signIn(withEmail: email, link: password) { result, error in
+            if let error = error {
+                loginStatusMessage = "Failed to login User: \(error)"
+                return
+            }
+            
+            loginStatusMessage = "Successfully login User: \(result?.user.uid ?? "")"
         }
     }
 }
