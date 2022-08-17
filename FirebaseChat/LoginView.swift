@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct LoginView: View {
     @State var email = ""
@@ -67,6 +68,7 @@ struct LoginView: View {
             .navigationTitle(isLoginMode ? "Login" : "Create Account")
             .background(Color(.init(white: 0, alpha: 0.05)).ignoresSafeArea())
         }
+        .navigationViewStyle(.stack)
     }
 }
 
