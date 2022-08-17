@@ -111,6 +111,7 @@ private extension LoginView {
             }
             
             loginStatusMessage = "Successfully create User: \(result?.user.uid ?? "")"
+            persistImageToStorage()
         }
     }
     
@@ -120,8 +121,8 @@ private extension LoginView {
                 loginStatusMessage = "Failed to login User: \(error)"
                 return
             }
-            
             loginStatusMessage = "Successfully login User: \(result?.user.uid ?? "")"
+            
         }
     }
     
@@ -141,11 +142,28 @@ private extension LoginView {
                 switch response {
                 case .success(let url):
                     self.loginStatusMessage = "Successfully stored image with url: \(url.absoluteString)"
+                    storeUserInformation(url: url)
                 case .failure(let error):
                     self.loginStatusMessage = "Failed to retrieve downloadURL: \(error)"
                 }
             }
         }
+    }
+    
+    func storeUserInformation(url imageURL: URL) {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
+            return
+        }
+        let userData = ["email": self.email, "uid" : uid, "imageURL" : imageURL.absoluteString]
+        FirebaseManager.shared.firestore.collection("users")
+            .document(uid).setData(userData) { error in
+                if let error = error {
+                    self.loginStatusMessage = "\(error)"
+                    return
+                }
+                
+                print("Success")
+            }
     }
 }
 
