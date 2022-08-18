@@ -10,23 +10,32 @@ import Combine
 
 final class MainMessagesViewModel: ObservableObject {
     @Published var chatUser: ChatUser?
+    @Published var isUserCurrentlyLoggedOut = false
     
     init() {
         fetchCurrentUser()
     }
 }
 
-private extension MainMessagesViewModel {
+extension MainMessagesViewModel {
+    func handleSignOut() {
+        isUserCurrentlyLoggedOut.toggle()
+        try? FirebaseManager.shared.auth.signOut()
+    }
+    
     func fetchCurrentUser() {
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
+            DispatchQueue.main.async {
+                self.isUserCurrentlyLoggedOut.toggle()
+            }
             return
         }
         
         FirebaseManager.shared.firestore.collection("users")
             .document(uid)
             .getDocument { [weak self] snapshot, error in
-                guard error != nil else {
-                    print(error?.localizedDescription ?? "")
+                if let error = error {
+                    print(error.localizedDescription)
                     return
                 }
                 
@@ -34,8 +43,7 @@ private extension MainMessagesViewModel {
                     return
                 }
                 
-                let (uid, email, imageURL) = (data["uid"] as? String ?? "", data["email"] as? String ?? "", data["imageURL"] as? String ?? "")
-                self?.chatUser = ChatUser(uid: uid, email: email, imageURL: imageURL)
+                self?.chatUser = ChatUser(data: data)
             }
     }
 }

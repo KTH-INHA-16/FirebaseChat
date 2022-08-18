@@ -9,4 +9,8 @@ import Foundation
 
 struct ChatUser {
     let uid, email, imageURL: String
+    
+    init(data: [String: Any]) {
+        (uid, email, imageURL) = (data["uid"] as? String ?? "", data["email"] as? String ?? "", data["imageURL"] as? String ?? "")
+    }
 }

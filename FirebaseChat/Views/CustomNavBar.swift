@@ -19,8 +19,8 @@ struct CustomNavBar: View {
                     image
                         .resizable()
                         .scaledToFill()
+                        .frame(width: 50, height: 50)
                         .clipShape(Circle())
-                        .frame(width: 50)
                         .overlay(RoundedRectangle(cornerRadius: 44)
                             .stroke(Color(.label), lineWidth: 1))
                         .shadow(radius: 5)
@@ -60,7 +60,13 @@ struct CustomNavBar: View {
         .padding()
         .confirmationDialog("What do you want to do?", isPresented: $shouldShowLogOutOptions, titleVisibility: .visible, actions: {
             Button("Sign Out", role: .destructive, action: {
-                
+                viewModel.handleSignOut()
+            })
+        })
+        .fullScreenCover(isPresented: $viewModel.isUserCurrentlyLoggedOut, content: {
+            LoginView(didCompleteLoginProcess: {
+                self.viewModel.isUserCurrentlyLoggedOut = false
+                self.viewModel.fetchCurrentUser()
             })
         })
     }

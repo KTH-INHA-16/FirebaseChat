@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct LoginView: View {
+    
+    let didCompleteLoginProcess: () -> ()
+    
     @State private var email = ""
     @State private var password = ""
     @State private var isLoginMode = false
@@ -104,6 +107,11 @@ private extension LoginView {
     }
     
     func createNewAccount() {
+        if self.image == nil {
+            self.loginStatusMessage = "You must select an avatar image"
+            return
+        }
+        
         FirebaseManager.shared.auth.createUser(withEmail: email, password: password) { result, error in
             if let error = error {
                 loginStatusMessage = "Failed to create User: \(error)"
@@ -116,6 +124,11 @@ private extension LoginView {
     }
     
     func loginUser() {
+        if FirebaseManager.shared.auth.isSignIn(withEmailLink: email) {
+            try? FirebaseManager.shared.auth.signOut()
+            return
+        }
+        
         FirebaseManager.shared.auth.signIn(withEmail: email, link: password) { result, error in
             if let error = error {
                 loginStatusMessage = "Failed to login User: \(error)"
@@ -123,6 +136,7 @@ private extension LoginView {
             }
             loginStatusMessage = "Successfully login User: \(result?.user.uid ?? "")"
             
+            self.didCompleteLoginProcess()
         }
     }
     
@@ -162,13 +176,15 @@ private extension LoginView {
                     return
                 }
                 
-                print("Success")
+                self.didCompleteLoginProcess()
             }
     }
 }
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+        LoginView(didCompleteLoginProcess: {
+            
+        })
     }
 }
