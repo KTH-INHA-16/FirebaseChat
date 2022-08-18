@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct MainMessagesView: View {
+    @StateObject private var viewModel = MainMessagesViewModel()
     @State private var shouldShowLogOutOptions = false
     
     var body: some View {
         NavigationView {
             VStack {
-                CustomNavBar(shouldShowLogOutOptions: $shouldShowLogOutOptions)
+                CustomNavBar(viewModel: viewModel, shouldShowLogOutOptions: $shouldShowLogOutOptions)
                 
                 MessageListView()
             }

@@ -8,15 +8,34 @@
 import SwiftUI
 
 struct CustomNavBar: View {
+    @StateObject var viewModel: MainMessagesViewModel
     @Binding var shouldShowLogOutOptions: Bool
     
     var body: some View {
         HStack(spacing: 16) {
-            Image(systemName: "person.fill")
-                .font(.system(size: 34, weight: .heavy))
+            AsyncImage(url: URL(string: viewModel.chatUser?.imageURL ?? ""), content: { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .clipShape(Circle())
+                        .frame(width: 50)
+                        .overlay(RoundedRectangle(cornerRadius: 44)
+                            .stroke(Color(.label), lineWidth: 1))
+                        .shadow(radius: 5)
+                default:
+                    Image(systemName: "person.fill")
+                        .font(.system(size: 50, weight: .heavy))
+                        .overlay(RoundedRectangle(cornerRadius: 44)
+                            .stroke(Color(.label), lineWidth: 1))
+                        .shadow(radius: 5)
+                }
+            })
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("UserName")
+                let email = viewModel.chatUser?.email.replacingOccurrences(of: "@gmail.com", with: "") ?? ""
+                Text(email)
                     .font(.system(size: 24, weight: .bold))
                 
                 HStack {
@@ -49,6 +68,6 @@ struct CustomNavBar: View {
 
 struct CustomNavBar_Previews: PreviewProvider {
     static var previews: some View {
-        CustomNavBar(shouldShowLogOutOptions: .constant(false))
+        CustomNavBar(viewModel: MainMessagesViewModel(), shouldShowLogOutOptions: .constant(false))
     }
 }
