@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct NewMessageButton: View {
+    @Binding var shouldShowNewMessageScreen: Bool
+    
     var body: some View {
         Button(action: {
-            
+            shouldShowNewMessageScreen.toggle()
         }, label: {
             HStack {
                 Spacer()
@@ -25,11 +27,14 @@ struct NewMessageButton: View {
             .padding(.horizontal)
             .shadow(radius: 15)
         })
+        .fullScreenCover(isPresented: $shouldShowNewMessageScreen, content: {
+            Text("New Message Screen")
+        })
     }
 }
 
 struct newMessageButton_Previews: PreviewProvider {
     static var previews: some View {
-        NewMessageButton()
+        NewMessageButton(shouldShowNewMessageScreen: .constant(false))
     }
 }

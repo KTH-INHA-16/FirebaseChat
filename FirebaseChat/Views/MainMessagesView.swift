@@ -10,6 +10,7 @@ import SwiftUI
 struct MainMessagesView: View {
     @StateObject private var viewModel = MainMessagesViewModel()
     @State private var shouldShowLogOutOptions = false
+    @State private var shouldShowNewMessageScreen = false
     
     var body: some View {
         NavigationView {
@@ -18,7 +19,7 @@ struct MainMessagesView: View {
                 
                 MessageListView()
             }
-            .overlay(NewMessageButton(), alignment: .bottom)
+            .overlay(NewMessageButton(shouldShowNewMessageScreen: $shouldShowNewMessageScreen), alignment: .bottom)
             .navigationBarHidden(true)
         }
     }
