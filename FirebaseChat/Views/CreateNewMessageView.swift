@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CreateNewMessageView: View {
+    let didSelectNewUser: (ChatUser) -> ()
+    
     @Environment(\.presentationMode) var presentationMode
     @StateObject var viewModel = CreateNewMessageViewModel()
     
@@ -17,6 +19,7 @@ struct CreateNewMessageView: View {
                 ForEach(viewModel.users) { user in
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
+                        didSelectNewUser(user)
                     }, label: {
                         HStack {
                             AsyncImage(url: URL(string: user.imageURL), content: { phase in
@@ -68,6 +71,6 @@ struct CreateNewMessageView: View {
 
 struct CreateNewMessageView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateNewMessageView()
+        CreateNewMessageView(didSelectNewUser: { _ in })
     }
 }

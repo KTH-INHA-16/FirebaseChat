@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NewMessageButton: View {
     @Binding var shouldShowNewMessageScreen: Bool
+    @Binding var chatUser: ChatUser?
     
     var body: some View {
         Button(action: {
@@ -28,13 +29,15 @@ struct NewMessageButton: View {
             .shadow(radius: 15)
         })
         .fullScreenCover(isPresented: $shouldShowNewMessageScreen, content: {
-            Text("New Message Screen")
+            CreateNewMessageView { user in
+                self.chatUser = user
+            }
         })
     }
 }
 
 struct newMessageButton_Previews: PreviewProvider {
     static var previews: some View {
-        NewMessageButton(shouldShowNewMessageScreen: .constant(false))
+        NewMessageButton(shouldShowNewMessageScreen: .constant(false), chatUser: .constant(nil))
     }
 }

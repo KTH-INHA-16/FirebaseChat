@@ -9,8 +9,10 @@ import SwiftUI
 
 struct MainMessagesView: View {
     @StateObject private var viewModel = MainMessagesViewModel()
-    @State private var shouldShowLogOutOptions = false
-    @State private var shouldShowNewMessageScreen = false
+    @State var shouldShowLogOutOptions = false
+    @State var shouldShowNewMessageScreen = false
+    @State var shouldNavigateToChatLogView = false
+    @State var chatUser: ChatUser?
     
     var body: some View {
         NavigationView {
@@ -18,8 +20,16 @@ struct MainMessagesView: View {
                 CustomNavBar(viewModel: viewModel, shouldShowLogOutOptions: $shouldShowLogOutOptions)
                 
                 MessageListView()
+                
+                NavigationLink("",
+                               isActive: $shouldNavigateToChatLogView,
+                               destination: {
+                    ChatLogView(chatUser: $chatUser)
+                })
             }
-            .overlay(NewMessageButton(shouldShowNewMessageScreen: $shouldShowNewMessageScreen), alignment: .bottom)
+            .overlay(NewMessageButton(shouldShowNewMessageScreen: $shouldShowNewMessageScreen,
+                                      chatUser: $chatUser),
+                     alignment: .bottom)
             .navigationBarHidden(true)
         }
     }
