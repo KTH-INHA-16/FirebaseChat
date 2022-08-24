@@ -24,10 +24,11 @@ struct MainMessagesView: View {
                 NavigationLink("",
                                isActive: $shouldNavigateToChatLogView,
                                destination: {
-                    ChatLogView(chatUser: $chatUser)
+                    ChatLogView(chatUser: chatUser)
                 })
             }
             .overlay(NewMessageButton(shouldShowNewMessageScreen: $shouldShowNewMessageScreen,
+                                      shouldNavigateToChatLogView: $shouldNavigateToChatLogView,
                                       chatUser: $chatUser),
                      alignment: .bottom)
             .navigationBarHidden(true)

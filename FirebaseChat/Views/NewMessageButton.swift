@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NewMessageButton: View {
     @Binding var shouldShowNewMessageScreen: Bool
+    @Binding var shouldNavigateToChatLogView: Bool
     @Binding var chatUser: ChatUser?
     
     var body: some View {
@@ -31,6 +32,7 @@ struct NewMessageButton: View {
         .fullScreenCover(isPresented: $shouldShowNewMessageScreen, content: {
             CreateNewMessageView { user in
                 self.chatUser = user
+                self.shouldNavigateToChatLogView.toggle()
             }
         })
     }
@@ -38,6 +40,6 @@ struct NewMessageButton: View {
 
 struct newMessageButton_Previews: PreviewProvider {
     static var previews: some View {
-        NewMessageButton(shouldShowNewMessageScreen: .constant(false), chatUser: .constant(nil))
+        NewMessageButton(shouldShowNewMessageScreen: .constant(false), shouldNavigateToChatLogView: .constant(false), chatUser: .constant(nil))
     }
 }

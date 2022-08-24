@@ -8,13 +8,18 @@
 import SwiftUI
 
 struct ChatLogView: View {
-    @Binding var chatUser: ChatUser?
+    var chatUser: ChatUser?
+    @ObservedObject var viewModel: ChatLogViewModel
+    
+    init(chatUser: ChatUser?) {
+        self.chatUser = chatUser
+        viewModel = ChatLogViewModel(chatUser: chatUser)
+    }
     
     var body: some View {
-        ScrollView {
-            ForEach(0..<10) {
-                Text("\($0)")
-            }
+        ZStack {
+            MessagesView(chatUser: chatUser)
+            Text(viewModel.errorMessage)
         }
         .navigationTitle(chatUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
@@ -23,6 +28,6 @@ struct ChatLogView: View {
 
 struct ChatLogView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatLogView(chatUser: .constant(nil))
+        ChatLogView(chatUser: nil)
     }
 }
