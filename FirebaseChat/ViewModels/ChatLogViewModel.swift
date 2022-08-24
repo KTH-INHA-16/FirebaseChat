@@ -12,12 +12,15 @@ import Firebase
 final class ChatLogViewModel: ObservableObject {
     @Published var chatText = ""
     @Published var errorMessage = ""
+    @Published var count = 0
     @Published var chatMessages: [ChatMessage] = []
     
     let chatUser: ChatUser?
     
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
+        
+        fetchMessages()
     }
 }
 
@@ -44,6 +47,10 @@ private extension ChatLogViewModel {
                         let docId = $0.document.documentID
                         self?.chatMessages.append(.init(documentId: docId, data: data))
                     }
+                
+                DispatchQueue.main.async {
+                    self.count += 1
+                }
             }
     }
 }
@@ -67,6 +74,7 @@ extension ChatLogViewModel {
             }
             self.errorMessage.removeAll()
             self.chatText.removeAll()
+            self.count += 1
         }
         
         let recipientMessageDocument = FirebaseManager.shared.firestore
