@@ -12,10 +12,39 @@ import Firebase
 final class ChatLogViewModel: ObservableObject {
     @Published var chatText = ""
     @Published var errorMessage = ""
+    @Published var chatMessages: [ChatMessage] = []
+    
     let chatUser: ChatUser?
     
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
+    }
+}
+
+private extension ChatLogViewModel {
+    func fetchMessages() {
+        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid, let toId = chatUser?.uid else { return }
+        
+        FirebaseManager.shared.firestore
+            .collection("messages")
+            .document(fromId)
+            .collection(toId)
+            .order(by: "timestamp")
+            .addSnapshotListener { querySnapshot, error in
+                if let error = error {
+                    self.errorMessage = "Failed to listen for messages: \(error)"
+                    return
+                }
+                
+                querySnapshot?.documentChanges
+                    .filter {
+                        $0.type == .added
+                    }.forEach { [weak self] in
+                        let data = $0.document.data()
+                        let docId = $0.document.documentID
+                        self?.chatMessages.append(.init(documentId: docId, data: data))
+                    }
+            }
     }
 }
 

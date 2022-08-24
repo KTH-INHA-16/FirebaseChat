@@ -11,9 +11,9 @@ struct ChatBottomBarView: View {
     @ObservedObject var viewModel: ChatLogViewModel
     let chatUser: ChatUser?
     
-    init(chatUser: ChatUser?) {
+    init(chatUser: ChatUser?, viewModel: ChatLogViewModel) {
         self.chatUser = chatUser
-        self.viewModel = .init(chatUser: chatUser)
+        self.viewModel = viewModel
     }
     
     var body: some View {
@@ -40,6 +40,6 @@ struct ChatBottomBarView: View {
 
 struct ChatBottomBarView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatBottomBarView(chatUser: nil)
+        ChatBottomBarView(chatUser: nil, viewModel: ChatLogViewModel(chatUser: nil))
     }
 }

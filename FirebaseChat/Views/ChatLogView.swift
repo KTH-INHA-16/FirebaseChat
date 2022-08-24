@@ -18,7 +18,7 @@ struct ChatLogView: View {
     
     var body: some View {
         ZStack {
-            MessagesView(chatUser: chatUser)
+            MessagesView(chatUser: chatUser, viewModel: viewModel)
             Text(viewModel.errorMessage)
         }
         .navigationTitle(chatUser?.email ?? "")
